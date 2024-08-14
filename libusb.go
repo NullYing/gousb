@@ -414,18 +414,18 @@ func (libusbImpl) getStringDesc(d *libusbDevHandle, index int) (string, error) {
 	return string(buf[:errno]), nil
 }
 
-func (libusbImpl) getDescriptor(d *libusbDevHandle, index int) ([]byte, error) {
+func (libusbImpl) getDescriptor(d *libusbDevHandle, descType int) ([]byte, error) {
 	// allocate 200-byte array limited the length of descriptor
 	buf := make([]byte, 256)
 	// get descriptor from libusb. if errno < 0 then there are any errors.
 	// if errno >= 0; it is a length of result descriptor
 	errno := C.libusb_get_descriptor(
 		(*C.libusb_device_handle)(d),
-		C.uint8_t(index), 0,
+		C.uint8_t(descType), 0,
 		(*C.uchar)(unsafe.Pointer(&buf[0])),
 		256)
 	if errno < 0 {
-		return nil, fmt.Errorf("failed to get descriptor %d: %s", index, fromErrNo(errno))
+		return nil, fmt.Errorf("failed to get descriptor %d: %s", descType, fromErrNo(errno))
 	}
 	return buf[:errno], nil
 }
